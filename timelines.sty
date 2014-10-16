@@ -1,0 +1,210 @@
+%-------------------------------------------------------------------------------
+% timelines (LaTeX package)
+%-------------------------------------------------------------------------------
+% Version: 0.0.3
+% Date: 16 October 2014
+% Author: Tobias Kuhn
+%-------------------------------------------------------------------------------
+
+\ProvidesPackage{timelines}
+
+\usepackage{ifthen}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+
+
+% Lengths
+
+\newlength{\tlpos}
+\newlength{\tlsepl}
+\newlength{\tlsepr}
+\newlength{\tlwidth}
+
+
+% Layers
+
+\pgfdeclarelayer{tlback}
+\pgfdeclarelayer{tllines}
+\pgfdeclarelayer{tltails}
+\pgfdeclarelayer{tltext}
+
+
+% Timeline Arguments
+
+\newcommand{\tlunit}{}
+\newcommand{\tlmin}{}
+\newcommand{\tlmax}{}
+\newcommand{\tlstep}{}
+\newcommand{\tlsteps}{}
+\newcommand{\tlscale}{}
+\newcommand{\tlplainchart}{}
+\makeatletter
+\define@key{timeline}{unit}{\renewcommand{\tlunit}{#1}}
+\define@key{timeline}{width}{\setlength{\tlwidth}{#1}}
+\define@key{timeline}{min}{\renewcommand{\tlmin}{#1}}
+\define@key{timeline}{max}{\renewcommand{\tlmax}{#1}}
+\define@key{timeline}{step}{\renewcommand{\tlstep}{#1}}
+\define@key{timeline}{steps}{\renewcommand{\tlsteps}{#1}}
+\define@key{timeline}{scale}{\renewcommand{\tlscale}{#1}}
+\define@key{timeline}{plain}[false]{\renewcommand{\tlplainchart}{true}}
+\makeatother
+
+
+% Bar Arguments
+
+\newcommand{\tlid}{}
+\newcommand{\tlbarcolor}{}
+\newcommand{\tlwhiteshade}{}
+\newcommand{\tlblackshade}{}
+\newcommand{\tlfadein}{}
+\newcommand{\tlfadeout}{}
+\newcommand{\tlconnectfront}{}
+\newcommand{\tllabelabove}{}
+\newcommand{\tllinewidth}{}
+\makeatletter
+\define@key{tlbar}{id}{\renewcommand{\tlid}{#1}}
+\define@key{tlbar}{color}{\renewcommand{\tlbarcolor}{#1}}
+\define@key{tlbar}{whiteshade}{\renewcommand{\tlwhiteshade}{#1}}
+\define@key{tlbar}{blackshade}{\renewcommand{\tlblackshade}{#1}}
+\define@key{tlbar}{fadein}[false]{\renewcommand{\tlfadein}{true}}
+\define@key{tlbar}{fadeout}[false]{\renewcommand{\tlfadeout}{true}}
+\define@key{tlbar}{connect}[false]{\renewcommand{\tlconnectfront}{true}}
+\define@key{tlbar}{labelabove}[false]{\renewcommand{\tllabelabove}{true}}
+\define@key{tlbar}{linewidth}{\renewcommand{\tllinewidth}{#1}}
+\makeatother
+
+
+% Timeline Enviroment
+
+\newenvironment{timeline}[1][]{%
+  \pgfsetlayers{tlback,tllines,tltails,main,tltext}%
+  % Bars:
+  \newcommand{\tlbar}[4][]{
+    % Set defaults:
+    \renewcommand{\tlid}{last}
+    \renewcommand{\tlbarcolor}{gray}
+    \renewcommand{\tlwhiteshade}{20}
+    \renewcommand{\tlblackshade}{20}
+    \renewcommand{\tlfadein}{false}
+    \renewcommand{\tlfadeout}{false}
+    \renewcommand{\tlconnectfront}{false}
+    \renewcommand{\tllabelabove}{false}
+    \renewcommand{\tllinewidth}{0.1mm}
+    \setlength{\tlsepl}{0mm}
+    \setlength{\tlsepr}{0mm}
+    % Read parameters:
+    \setkeys{tlbar}{##1}
+    % Draw line:
+    \begin{pgfonlayer}{tltails}
+	  \draw[color=black!40!white!80!\tlbarcolor,ultra thick] ($##2-\tlmin*(\tlwidth/\tlrange,0) + (0,\tlpos-2mm)$) node[inner sep=0,anchor=west] (tl-\tlid) {} -- (\tlwidth,\tlpos-2mm);
+    \end{pgfonlayer}
+    % Draw fade in:
+    \ifthenelse{\equal{\tlfadein}{true}}{
+      \addtolength{\tlsepl}{2.5mm}
+      \fill[color=black!50!\tlbarcolor,draw,top color=white!\tlwhiteshade!\tlbarcolor,bottom color=black!\tlblackshade!\tlbarcolor,rounded corners=0.25mm,ultra thin] ($##2-\tlmin*(\tlwidth/\tlrange,0) + (1mm,\tlpos)$) rectangle +(1mm,-4mm);
+      \fill[color=black!50!\tlbarcolor,draw,top color=white!\tlwhiteshade!\tlbarcolor,bottom color=black!\tlblackshade!\tlbarcolor,rounded corners=0.125mm,ultra thin] ($##2-\tlmin*(\tlwidth/\tlrange,0) + (0,\tlpos)$) rectangle +(0.5mm,-4mm);
+    }{}
+    % Draw fade out:
+    \ifthenelse{\equal{\tlfadeout}{true}}{
+      \addtolength{\tlsepr}{2.5mm}
+      \fill[color=black!50!\tlbarcolor,draw,top color=white!\tlwhiteshade!\tlbarcolor,bottom color=black!\tlblackshade!\tlbarcolor,rounded corners=0.25mm,ultra thin] ($##3-\tlmin*(\tlwidth/\tlrange,0) + (-2.0mm,\tlpos)$) rectangle +(1mm,-4mm);
+      \fill[color=black!50!\tlbarcolor,draw,top color=white!\tlwhiteshade!\tlbarcolor,bottom color=black!\tlblackshade!\tlbarcolor,rounded corners=0.125mm,ultra thin] ($##3-\tlmin*(\tlwidth/\tlrange,0) + (-0.5mm,\tlpos)$) rectangle +(0.5mm,-4mm);
+    }{}
+    % Draw bar:
+    \fill[color=black!50!\tlbarcolor,draw,top color=white!\tlwhiteshade!\tlbarcolor,bottom color=black!\tlblackshade!\tlbarcolor,rounded corners=0.5mm,line width=\tllinewidth] ($##2-\tlmin*(\tlwidth/\tlrange,0) + (\tlsepl,\tlpos) + 0.5*(\tllinewidth,0)$) rectangle ($##3-\tlmin*(\tlwidth/\tlrange,0) + (-\tlsepr,\tlpos-4mm) + 0.5*(-\tllinewidth,0)$);
+    % Write text:
+    \begin{pgfonlayer}{tltext}
+      \ifthenelse{\equal{\tllabelabove}{true}}{
+        \node[anchor=west] at ($##2-\tlmin*(\tlwidth/\tlrange,0) + (0,\tlpos+2.5mm)$) {\sf ##4};
+      }{
+        \node[anchor=east] at ($##2-\tlmin*(\tlwidth/\tlrange,0) + (-1mm,\tlpos-2mm)$) {\sf ##4};
+      }
+    \end{pgfonlayer}
+    % Move vertical position downward:
+    \addtolength{\tlpos}{-5mm}
+  }%%
+  % Connections:
+  \newcommand{\tlconnect}[3][]{
+    % Set defaults:
+    \renewcommand{\tlbarcolor}{gray}
+    % Read parameters:
+    \setkeys{tlbar}{##1}
+    \begin{pgfonlayer}{tllines}
+      \draw[color=black!40!white!80!\tlbarcolor,ultra thick,line cap=round] (tl-##3) -- +(-1.5mm,0);
+      \draw[color=black!40!white!80!\tlbarcolor,ultra thick] ($(tl-##3) + (-1.5mm,0)$) |- (tl-##2);
+    \end{pgfonlayer}
+  }%
+  \newcommand{\tlwconnect}[3][]{
+    % Set defaults:
+    \renewcommand{\tlbarcolor}{gray}
+    % Read parameters:
+    \setkeys{tlbar}{##1}
+    \begin{pgfonlayer}{tllines}
+      \draw[color=black!40!white!80!\tlbarcolor,ultra thick,line cap=round] (tl-##3) -- +(-1.5mm,0);
+      \draw[color=black!40!white!80!\tlbarcolor,ultra thick,dotted] ($(tl-##3) + (-1.5mm,0)$) |- (tl-##2);
+    \end{pgfonlayer}
+  }%
+  % X-axis label:
+  \newcommand{\getbcxlabel}{}%
+  \newcommand{\tlxlabel}[1]{
+    \renewcommand{\getbcxlabel}{##1}
+  }%
+  \newcommand{\tlrange}{\tlstripunit{\dimexpr\tlmax pt-\tlmin pt\relax}}
+  % Set defaults:
+  \renewcommand{\tlunit}{}%
+  \renewcommand{\tlmin}{1900}%
+  \renewcommand{\tlmax}{2000}%
+  \renewcommand{\tlstep}{\tlrange}%
+  \renewcommand{\tlsteps}{0,\tlstep,...,\tlrange}%
+  \renewcommand{\tlscale}{1}%
+  \renewcommand{\tlplainchart}{false}%
+  \setlength{\tlpos}{-2.5mm}%
+  \setlength{\tlwidth}{8cm}%
+  % Read parameters:
+  \setkeys{timeline}{#1}%
+  % Draw chart:
+  \begin{tikzpicture}[scale=\tlscale]
+}{
+    % Draw axes:
+    \draw (0,\tlpos) -- (\tlwidth,\tlpos);
+    %\draw (0,0) -- (0,\tlpos);
+    % Draw scale:
+    \ifthenelse{\equal{\tlplainchart}{true}}
+    { % Scale off
+      % Set position for x-axis label:
+      \coordinate (labelpos) at (0,\tlpos-2mm);
+    }{ % Scale on
+      % Draw start value and set position for x-axis label:
+      \draw (0,\tlpos) -- (0,\tlpos-1mm);
+      \node[anchor=north] (n) at (0,\tlpos-1mm)
+        {\sf \tlstripunit{\dimexpr\tlmin pt\relax}\tlunit};
+      \coordinate (labelpos) at (n.south);
+      \begin{pgfonlayer}{tlback}
+        \draw[color=black!5,thick] (0,0) -- (0,\tlpos);
+      \end{pgfonlayer}
+      % Draw other values:
+      \foreach \x in \tlsteps {
+        \ifthenelse{\equal{\x}{0}}{}{
+          \draw ($\x*(\tlwidth/\tlrange,0) + (0,\tlpos)$) -- ($\x*(\tlwidth/\tlrange,0) + (0,\tlpos-1mm)$);
+          \node[anchor=north] at ($\x*(\tlwidth/\tlrange,0) + (0,\tlpos-1mm)$)
+            {\sf \tlstripunit{\dimexpr\tlmin pt+\x pt\relax}\tlunit};
+          \begin{pgfonlayer}{tlback}
+            \draw[color=black!10,thick] ($\x*(\tlwidth/\tlrange,0)$) -- ($\x*(\tlwidth/\tlrange,0) + (0,\tlpos)$);
+          \end{pgfonlayer}
+        }
+      }
+    }
+    % Write x-axis label:
+    \ifthenelse{\equal{\getbcxlabel}{}}{}{
+      \node[anchor=north,inner sep=0.5mm] at ($0.5*(\tlwidth,0) + (labelpos)$) {\sf \getbcxlabel};
+    }
+  \end{tikzpicture}%
+}
+
+
+% Auxiliary commands
+
+\makeatletter
+\newcommand*{\tlstripunit}[1]{\strip@pt#1}
+\makeatother
+
