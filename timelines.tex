@@ -7,10 +7,10 @@
 \title{
   \texttt{timelines}: Simple Timeline Diagrams in \LaTeX
   \medskip\\
-  \large Version 0.0.3
+  \large Version 0.0.4
 }
 \author{Tobias Kuhn}
-\date{16 October 2014}
+\date{19 October 2014}
 
 \begin{document}
 
@@ -33,10 +33,10 @@ To use the package, you have to make sure that {\LaTeX} is able find the file \t
 Timeline diagrams are created with the \texttt{timeline} environment. Within this environment, you can put one or more bars by using the \texttt{tlbar} command. The code of a very timeline diagram and the resulting picture are shown here:
 \begin{quote}\small
 \begin{verbatim}
-\begin{timeline}[min=2006,max=2014,step=1]
-  \tlbar{2008}{2010}{Project A}
-  \tlbar{2009}{2013}{Project B}
-  \tlbar{2011}{2014}{Project C}
+\begin{timeline}[min=2008,max=2014,step=1]
+  \tlbar{2009}{2011}{Project A}
+  \tlbar{2010}{2013}{Project B}
+  \tlbar{2012}{2014}{Project C}
 \end{timeline}
 \end{verbatim}
 \end{quote}
@@ -45,6 +45,61 @@ Timeline diagrams are created with the \texttt{timeline} environment. Within thi
   \tlbar{2009}{2011}{Project A}
   \tlbar{2010}{2013}{Project B}
   \tlbar{2012}{2014}{Project C}
+\end{timeline}
+\end{quote}
+Fade in/out effects can be achieve with the options \texttt{fadein} and \texttt{fadeout}:
+\begin{quote}\small
+\begin{verbatim}
+\begin{timeline}[min=2008,max=2014,step=1]
+  \tlbar[fadeout]{2009}{2013}{A}
+  \tlbar[fadein]{2010}{2014}{B}
+  \tlbar[fadein,fadeout]{2011}{2014}{C}
+\end{timeline}
+\end{verbatim}
+\end{quote}
+\begin{quote}
+\begin{timeline}[min=2008,max=2014,step=1]
+  \tlbar[fadeout]{2009}{2013}{A}
+  \tlbar[fadein]{2010}{2014}{B}
+  \tlbar[fadein,fadeout]{2011}{2014}{C}
+\end{timeline}
+\end{quote}
+Assigning IDs and connect the bars with \texttt{tlconnect}:
+\begin{quote}\small
+\begin{verbatim}
+\begin{timeline}[min=2000,max=2014,step=2]
+  \tlbar[id=foo]{2001}{2005}{Foo}
+  \tlbar[id=bar]{2004}{2007}{Bar}
+  \tlconnect{foo}{bar}
+  \tlbar[id=baz]{2009}{2013}{Baz}
+  \tlconnect{bar}{baz}
+\end{timeline}
+\end{verbatim}
+\end{quote}
+\begin{quote}
+\begin{timeline}[min=2000,max=2014,step=2]
+  \tlbar[id=foo]{2001}{2005}{Foo}
+  \tlbar[id=bar]{2004}{2007}{Bar}
+  \tlconnect{foo}{bar}
+  \tlbar[id=baz]{2009}{2013}{Baz}
+  \tlconnect{bar}{baz}
+\end{timeline}
+\end{quote}
+\texttt{tlwconnect} stands for ``weak'' connections, which are depicted by dashed lines:
+\begin{quote}\small
+\begin{verbatim}
+\begin{timeline}[min=2000,max=2014,step=2]
+  \tlbar[id=foo]{2001}{2005}{Foo}
+  \tlbar[id=baz]{2009}{2013}{Baz}
+  \tlwconnect{foo}{baz}
+\end{timeline}
+\end{verbatim}
+\end{quote}
+\begin{quote}
+\begin{timeline}[min=2000,max=2014,step=2]
+  \tlbar[id=foo]{2001}{2005}{Foo}
+  \tlbar[id=baz]{2009}{2013}{Baz}
+  \tlwconnect{foo}{baz}
 \end{timeline}
 \end{quote}
 

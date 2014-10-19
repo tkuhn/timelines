@@ -1,8 +1,8 @@
 %-------------------------------------------------------------------------------
 % timelines (LaTeX package)
 %-------------------------------------------------------------------------------
-% Version: 0.0.3
-% Date: 16 October 2014
+% Version: 0.0.4
+% Date: 19 October 2014
 % Author: Tobias Kuhn
 %-------------------------------------------------------------------------------
 
@@ -82,9 +82,9 @@
   \newcommand{\tlbar}[4][]{
     % Set defaults:
     \renewcommand{\tlid}{last}
-    \renewcommand{\tlbarcolor}{gray}
-    \renewcommand{\tlwhiteshade}{20}
-    \renewcommand{\tlblackshade}{20}
+    \renewcommand{\tlbarcolor}{blue!40}
+    \renewcommand{\tlwhiteshade}{0}
+    \renewcommand{\tlblackshade}{0}
     \renewcommand{\tlfadein}{false}
     \renewcommand{\tlfadeout}{false}
     \renewcommand{\tlconnectfront}{false}
@@ -96,22 +96,22 @@
     \setkeys{tlbar}{##1}
     % Draw line:
     \begin{pgfonlayer}{tltails}
-	  \draw[color=black!40!white!80!\tlbarcolor,ultra thick] ($##2-\tlmin*(\tlwidth/\tlrange,0) + (0,\tlpos-2mm)$) node[inner sep=0,anchor=west] (tl-\tlid) {} -- (\tlwidth,\tlpos-2mm);
+	  \draw[color=\tlbarcolor,ultra thick] ($##2-\tlmin*(\tlwidth/\tlrange,0) + (0,\tlpos-2mm)$) node[inner sep=0,anchor=west] (tl-\tlid) {} -- (\tlwidth,\tlpos-2mm);
     \end{pgfonlayer}
     % Draw fade in:
     \ifthenelse{\equal{\tlfadein}{true}}{
       \addtolength{\tlsepl}{2.5mm}
-      \fill[color=black!50!\tlbarcolor,draw,top color=white!\tlwhiteshade!\tlbarcolor,bottom color=black!\tlblackshade!\tlbarcolor,rounded corners=0.25mm,ultra thin] ($##2-\tlmin*(\tlwidth/\tlrange,0) + (1mm,\tlpos)$) rectangle +(1mm,-4mm);
-      \fill[color=black!50!\tlbarcolor,draw,top color=white!\tlwhiteshade!\tlbarcolor,bottom color=black!\tlblackshade!\tlbarcolor,rounded corners=0.125mm,ultra thin] ($##2-\tlmin*(\tlwidth/\tlrange,0) + (0,\tlpos)$) rectangle +(0.5mm,-4mm);
+      \draw[fill=\tlbarcolor,rounded corners=0.25mm,ultra thin] ($##2-\tlmin*(\tlwidth/\tlrange,0) + (1mm,\tlpos)$) rectangle +(1mm,-4mm);
+      \draw[fill=\tlbarcolor,rounded corners=0.125mm,ultra thin] ($##2-\tlmin*(\tlwidth/\tlrange,0) + (0,\tlpos)$) rectangle +(0.5mm,-4mm);
     }{}
     % Draw fade out:
     \ifthenelse{\equal{\tlfadeout}{true}}{
       \addtolength{\tlsepr}{2.5mm}
-      \fill[color=black!50!\tlbarcolor,draw,top color=white!\tlwhiteshade!\tlbarcolor,bottom color=black!\tlblackshade!\tlbarcolor,rounded corners=0.25mm,ultra thin] ($##3-\tlmin*(\tlwidth/\tlrange,0) + (-2.0mm,\tlpos)$) rectangle +(1mm,-4mm);
-      \fill[color=black!50!\tlbarcolor,draw,top color=white!\tlwhiteshade!\tlbarcolor,bottom color=black!\tlblackshade!\tlbarcolor,rounded corners=0.125mm,ultra thin] ($##3-\tlmin*(\tlwidth/\tlrange,0) + (-0.5mm,\tlpos)$) rectangle +(0.5mm,-4mm);
+      \draw[fill=\tlbarcolor,rounded corners=0.25mm,ultra thin] ($##3-\tlmin*(\tlwidth/\tlrange,0) + (-2.0mm,\tlpos)$) rectangle +(1mm,-4mm);
+      \draw[fill=\tlbarcolor,rounded corners=0.125mm,ultra thin] ($##3-\tlmin*(\tlwidth/\tlrange,0) + (-0.5mm,\tlpos)$) rectangle +(0.5mm,-4mm);
     }{}
     % Draw bar:
-    \fill[color=black!50!\tlbarcolor,draw,top color=white!\tlwhiteshade!\tlbarcolor,bottom color=black!\tlblackshade!\tlbarcolor,rounded corners=0.5mm,line width=\tllinewidth] ($##2-\tlmin*(\tlwidth/\tlrange,0) + (\tlsepl,\tlpos) + 0.5*(\tllinewidth,0)$) rectangle ($##3-\tlmin*(\tlwidth/\tlrange,0) + (-\tlsepr,\tlpos-4mm) + 0.5*(-\tllinewidth,0)$);
+    \draw[fill=\tlbarcolor,rounded corners=0.5mm,line width=\tllinewidth] ($##2-\tlmin*(\tlwidth/\tlrange,0) + (\tlsepl,\tlpos) + 0.5*(\tllinewidth,0)$) rectangle ($##3-\tlmin*(\tlwidth/\tlrange,0) + (-\tlsepr,\tlpos-4mm) + 0.5*(-\tllinewidth,0)$);
     % Write text:
     \begin{pgfonlayer}{tltext}
       \ifthenelse{\equal{\tllabelabove}{true}}{
@@ -125,23 +125,19 @@
   }%%
   % Connections:
   \newcommand{\tlconnect}[3][]{
-    % Set defaults:
-    \renewcommand{\tlbarcolor}{gray}
     % Read parameters:
     \setkeys{tlbar}{##1}
     \begin{pgfonlayer}{tllines}
-      \draw[color=black!40!white!80!\tlbarcolor,ultra thick,line cap=round] (tl-##3) -- +(-1.5mm,0);
-      \draw[color=black!40!white!80!\tlbarcolor,ultra thick] ($(tl-##3) + (-1.5mm,0)$) |- (tl-##2);
+      \draw[color=\tlbarcolor,ultra thick,line cap=round] (tl-##3) -- +(-1.5mm,0);
+      \draw[color=\tlbarcolor,ultra thick] ($(tl-##3) + (-1.5mm,0)$) |- (tl-##2);
     \end{pgfonlayer}
   }%
   \newcommand{\tlwconnect}[3][]{
-    % Set defaults:
-    \renewcommand{\tlbarcolor}{gray}
     % Read parameters:
     \setkeys{tlbar}{##1}
     \begin{pgfonlayer}{tllines}
-      \draw[color=black!40!white!80!\tlbarcolor,ultra thick,line cap=round] (tl-##3) -- +(-1.5mm,0);
-      \draw[color=black!40!white!80!\tlbarcolor,ultra thick,dotted] ($(tl-##3) + (-1.5mm,0)$) |- (tl-##2);
+      \draw[color=\tlbarcolor,ultra thick,line cap=round] (tl-##3) -- +(-1.5mm,0);
+      \draw[color=\tlbarcolor,ultra thick,dotted] ($(tl-##3) + (-1.5mm,0)$) |- (tl-##2);
     \end{pgfonlayer}
   }%
   % X-axis label:
@@ -152,8 +148,8 @@
   \newcommand{\tlrange}{\tlstripunit{\dimexpr\tlmax pt-\tlmin pt\relax}}
   % Set defaults:
   \renewcommand{\tlunit}{}%
-  \renewcommand{\tlmin}{1900}%
-  \renewcommand{\tlmax}{2000}%
+  \renewcommand{\tlmin}{2000}%
+  \renewcommand{\tlmax}{2020}%
   \renewcommand{\tlstep}{\tlrange}%
   \renewcommand{\tlsteps}{0,\tlstep,...,\tlrange}%
   \renewcommand{\tlscale}{1}%
